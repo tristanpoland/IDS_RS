@@ -24,7 +24,7 @@ ids_rs = "0.1"
 ### Basic Usage
 
 ```rust
-use ids_rs::{PciDatabase, VendorId, DeviceId};
+use ids_rs::{PciDatabase, VendorId, DeviceId, DeviceClassId, SubClassId};
 
 // Get the compiled database
 let db = PciDatabase::get();
@@ -157,14 +157,16 @@ The generated database uses efficient memory layouts:
 
 This crate is fully compatible with `no_std` environments:
 
-```rust
+```rust,no_run
 #![no_std]
 
 use ids_rs::{PciDatabase, VendorId};
 
-// Works in no_std environments
-let db = PciDatabase::get();
-let vendor = db.find_vendor(VendorId::new(0x8086));
+fn main() {
+    // Works in no_std environments
+    let db = PciDatabase::get();
+    let vendor = db.find_vendor(VendorId::new(0x8086));
+}
 ```
 
 The only requirement is the `heapless` crate for some string operations in type conversion methods.
