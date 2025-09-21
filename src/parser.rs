@@ -16,54 +16,71 @@ enum ParsingMode {
 /// Internal parser state for vendors and devices.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct VendorBuilder {
-    id: VendorId,
-    name: String,
-    devices: Vec<DeviceBuilder>,
+pub struct VendorBuilder {
+    /// The vendor ID
+    pub id: VendorId,
+    /// The vendor name
+    pub name: String,
+    /// The devices for this vendor
+    pub devices: Vec<DeviceBuilder>,
 }
 
 /// Internal parser state for devices.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct DeviceBuilder {
-    id: DeviceId,
-    name: String,
-    subsystems: Vec<SubsystemBuilder>,
+pub struct DeviceBuilder {
+    /// The device ID
+    pub id: DeviceId,
+    /// The device name
+    pub name: String,
+    /// The subsystems for this device
+    pub subsystems: Vec<SubsystemBuilder>,
 }
 
 /// Internal parser state for subsystems.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct SubsystemBuilder {
-    subvendor_id: SubvendorId,
-    subdevice_id: SubdeviceId,
-    name: String,
+pub struct SubsystemBuilder {
+    /// The subvendor ID
+    pub subvendor_id: SubvendorId,
+    /// The subdevice ID
+    pub subdevice_id: SubdeviceId,
+    /// The subsystem name
+    pub name: String,
 }
 
 /// Internal parser state for device classes.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct ClassBuilder {
-    id: DeviceClassId,
-    name: String,
-    subclasses: Vec<SubClassBuilder>,
+pub struct ClassBuilder {
+    /// The device class ID
+    pub id: DeviceClassId,
+    /// The device class name
+    pub name: String,
+    /// The subclasses for this device class
+    pub subclasses: Vec<SubClassBuilder>,
 }
 
 /// Internal parser state for subclasses.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct SubClassBuilder {
-    id: SubClassId,
-    name: String,
-    prog_interfaces: Vec<ProgInterfaceBuilder>,
+pub struct SubClassBuilder {
+    /// The subclass ID
+    pub id: SubClassId,
+    /// The subclass name
+    pub name: String,
+    /// The programming interfaces for this subclass
+    pub prog_interfaces: Vec<ProgInterfaceBuilder>,
 }
 
 /// Internal parser state for programming interfaces.
 #[derive(Debug)]
 #[allow(dead_code)]
-pub(crate) struct ProgInterfaceBuilder {
-    id: ProgInterfaceId,
-    name: String,
+pub struct ProgInterfaceBuilder {
+    /// The programming interface ID
+    pub id: ProgInterfaceId,
+    /// The programming interface name
+    pub name: String,
 }
 
 /// Parser for the PCI IDs database format.
@@ -115,6 +132,18 @@ impl PciIdsParser {
 
                 // Finalize any remaining vendor/device
                 self.finalize_vendor_device(&mut current_vendor, &mut current_device)?;
+            } else if count_leading_tabs(line) == 0 && !line.trim().starts_with("C ") && parsing_mode == ParsingMode::Classes {
+                // Check if this looks like a vendor line (4 hex digits followed by two spaces)
+                if line.trim().len() >= 6 && line.trim().chars().nth(4) == Some(' ') && line.trim().chars().nth(5) == Some(' ') {
+                    let hex_part = &line.trim()[..4];
+                    if hex_part.chars().all(|c| c.is_ascii_hexdigit()) {
+                        // Switch back to vendors mode
+                        parsing_mode = ParsingMode::Vendors;
+
+                        // Finalize any remaining class/subclass
+                        self.finalize_class_subclass(&mut current_class, &mut current_subclass)?;
+                    }
+                }
             }
 
             let indentation = count_leading_tabs(line);
@@ -286,15 +315,15 @@ impl PciIdsParser {
         Ok(())
     }
 
-    /// Get the parsed vendors (for use by build scripts).
+    /// Get the parsed vendors (for use by build scripts and tests).
     #[allow(dead_code)]
-    pub(crate) fn vendors(&self) -> &[VendorBuilder] {
+    pub fn vendors(&self) -> &[VendorBuilder] {
         &self.vendors
     }
 
-    /// Get the parsed classes (for use by build scripts).
+    /// Get the parsed classes (for use by build scripts and tests).
     #[allow(dead_code)]
-    pub(crate) fn classes(&self) -> &[ClassBuilder] {
+    pub fn classes(&self) -> &[ClassBuilder] {
         &self.classes
     }
 
