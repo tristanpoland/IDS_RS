@@ -1,0 +1,17 @@
+[package]
+name = "ids_rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["PCI IDS RS Contributors"]
+description = "A no_std PCI device identification library for operating systems"
+documentation = "https://docs.rs/ids_rs"
+repository = "https://github.com/your-username/ids_rs"
+license = "MIT OR Apache-2.0"
+keywords = ["pci", "hardware", "no_std", "os", "embedded"]
+categories = ["hardware-support", "no-std", "os"]
+readme = "README.md"
+
+[dependencies]
+heapless = "0.8"
+
+[build-dependencies]

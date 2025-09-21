@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pci-ids.ucw.cz)",
+      "Bash(chmod:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo clean:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
