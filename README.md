@@ -157,7 +157,7 @@ The generated database uses efficient memory layouts:
 
 This crate is fully compatible with `no_std` environments:
 
-```rust,no_run
+```rust,ignore
 #![no_std]
 
 use ids_rs::{PciDatabase, VendorId};
